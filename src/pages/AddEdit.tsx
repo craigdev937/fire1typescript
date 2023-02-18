@@ -1,6 +1,5 @@
 import React from "react";
 import { toast } from "react-toastify";
-import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { useParams, useNavigate } from "react-router-dom";
 import { ref, uploadBytesResumable, 
     getDownloadURL } from "firebase/storage";
@@ -11,9 +10,7 @@ export const AddEdit = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const blogID = id !== undefined ? String(id) : "";
-    const [data, setData] = React.useState({
-        id: "", title: "", description: ""
-    });
+    const [data, setData] = React.useState({title: "", description: ""});
     const [file, setFile] = React.useState<any | null>(null);
     let [progress, setProgress] = React.useState<number | null>(null);
     const { data: blog } = BlogAPI.useGetOneQuery(blogID);
@@ -63,7 +60,9 @@ export const AddEdit = () => {
     }, [file]);
 
     const handleChange = 
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement | 
+        HTMLTextAreaElement
+    >) => {
         setData({...data, 
             [event.target.name]: event.target.value});
     };
@@ -73,7 +72,8 @@ export const AddEdit = () => {
         setFile(event.target.files![0]);
     };
 
-    const handleSubmit = async (event: any) => {
+    const handleSubmit = 
+    async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (title && description) {
             if (!id) {
@@ -91,32 +91,34 @@ export const AddEdit = () => {
     return (
         <React.Fragment>
             <h1>{blogID ? "Update Blog" : "Create Blog"}</h1>
-            <input 
-                required
-                placeholder="Enter the Title"
-                type="text" 
-                name="title"
-                value={data.title}
-                onChange={handleChange}
-            />
-            <input 
-                required
-                placeholder="Enter the Description"
-                type="text" 
-                name="description"
-                value={data.description}
-                onChange={handleChange}
-            />
-            <input 
-                type="file" 
-                onChange={handleFile}
-            />
-            <button 
-                type="submit"
-                disabled={progress !== null && progress < 100}
-            >
-                {blogID ? "Update" : "Submit"}
-            </button>
+            <form onSubmit={handleSubmit}>
+                <input 
+                    required
+                    placeholder="Enter the Title"
+                    type="text" 
+                    name="title"
+                    value={data.title}
+                    onChange={handleChange}
+                />
+                <textarea 
+                    required
+                    rows={4}
+                    placeholder="Enter the Description"
+                    name="description" 
+                    value={data.description}
+                    onChange={handleChange}
+                />
+                <input 
+                    type="file" 
+                    onChange={handleFile}
+                />
+                <button 
+                    type="submit"
+                    disabled={progress !== null && progress < 100}
+                >
+                    {blogID ? "Update" : "Submit"}
+                </button>
+            </form>
         </React.Fragment>
     );
 };

@@ -1,8 +1,7 @@
 import { dBase } from "../config/keys";
 import { createApi, 
     fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import { collection, doc, serverTimestamp, 
-    addDoc, getDoc, getDocs, 
+import { collection, doc, addDoc, getDoc, getDocs, 
     deleteDoc, updateDoc } from "firebase/firestore";
 import { IBlog } from "../models/Interfaces";
 
@@ -49,8 +48,7 @@ export const BlogAPI = createApi({
             async queryFn(data) {
                 try {
                     await addDoc(collection(dBase, "blogs"), {
-                        ...data,
-                        timestamp: serverTimestamp(),
+                        ...data
                     });
                     return { data: "ok" };
                 } catch (error: any) {
@@ -62,9 +60,8 @@ export const BlogAPI = createApi({
         update: builder.mutation<string, IBlog>({
             async queryFn({ id, ...data }) {
                 try {
-                    await updateDoc(doc(dBase, "blogs", id), {
-                        ...data,
-                        timestamp: serverTimestamp(),
+                    await updateDoc(doc(dBase, "blogs", id!), {
+                        ...data
                     });
                     return { data: "ok" };
                 } catch (error: any) {
